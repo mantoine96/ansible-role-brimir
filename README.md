@@ -1,8 +1,9 @@
 Role Name
 =========
 
-This role aims to install a working version of the ticketing software Brimir (with Apache2, PostgreSQL and sendmail).
+This role aims to install a working version of the ticketing software [Brimir](https://github.com/ivaldi/brimir) (with Apache2, PostgreSQL and sendmail).
 
+Special thanks to frenkel, Brimir's maintainer !
 Requirements
 ------------
 
