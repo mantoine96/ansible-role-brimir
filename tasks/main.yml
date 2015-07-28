@@ -1,2 +1,84 @@
 ---
 # tasks file for brimir
+
+    - name: Update packages
+      apt: update_cache=yes upgrade=yes
+
+    - name: Add Passenger key
+      apt_key: keyserver=keyserver.ubuntu.com id={{passenger_key}}
+
+    - name: Remove postgresql
+      apt: name=postgresql state=absent purge=yes
+      
+    - name: Install packages
+      apt: name={{ item }} state=present
+      with_items:
+      - git
+      - ruby
+      - postgresql
+      - postgresql-client
+      - libpq-dev
+      - pwgen
+      - zlib1g-dev
+      - gem
+      - bundler
+      - curl
+      - apt-transport-https
+      - ca-certificates
+      - sendmail
+      - sendmail-bin
+
+    - name: Add Passenger repo
+      apt_repository: repo='deb https://oss-binaries.phusionpassenger.com/apt/passenger jessie main'
+                      state=present
+
+    - name: Install passenger
+      apt:  name=libapache2-mod-passenger state=present
+
+    - name: Enable passenger
+      shell: a2enmod passenger; apache2ctl stop; apache2ctl start
+
+    - name: Install execjs
+      gem: name=execjs state=latest
+
+    - name: Curl setup
+      shell: curl -sL https://deb.nodesource.com/setup | bash -
+
+    - name: Install build-essential
+      apt: name=build-essential state=present
+      
+    - name: Install Node.JS
+      apt: name=nodejs state=present
+
+    - name: Clone brimir
+      git: repo=https://github.com/ivaldi/brimir dest={{ install_path }}
+      ignore_errors: True
+
+    - name: Copy production.rb
+      copy: src=files/production.rb
+            dest={{ install_path }}/config/environments/production.rb
+
+    - name: Generate database.yml
+      script : files/setup-database.sh {{ install_path }}
+
+    - name: Install dependencies
+      shell: cd {{ install_path }} && bundle install --without sqlite mysql development test --deployment
+
+    - name: Generate secret
+      shell: cd {{ install_path }} && sed -i "s/<%= ENV\[\"SECRET_KEY_BASE\"\] %>/`bin/rake secret`/g" {{ install_path }}/config/secrets.yml
+
+    - name: Load db schema
+      shell: cd {{ install_path }} && bin/rake db:schema:load RAILS_ENV=production
+
+    - name: Precompile assets
+      shell: cd {{ install_path }} && bin/rake assets:precompile RAILS_ENV=production
+
+    - name: Generate user creation script
+      template: src=templates/loadFirstUser.j2
+                dest={{ install_path }}/loadUser.rb
+    - name: Create first user in db
+      shell: cd {{ install_path }} && bin/rails console production < loadUser.rb
+
+  ## TODO : Create system unit service
+    - name: Launch brimir
+      shell: cd {{ install_path }} && passenger start -a 0.0.0.0 -p 3000 -e production -d

@@ -1,31 +1,33 @@
 Role Name
 =========
 
-A brief description of the role goes here.
+This role aims to install a working version of the ticketing software Brimir (with Apache2, PostgreSQL and sendmail).
 
 Requirements
 ------------
 
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
+No requirements.
 
 Role Variables
 --------------
 
-A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
+passenger_key : This is the key for the passenger repo. The default is tuned for Debian 8 (Jessie). If you want another key, please visit [Passenger's documentation](https://www.phusionpassenger.com/documentation/Users%20guide%20Apache.html)
 
-Dependencies
-------------
+install_path : This is the path where Brimir will be installed. Default is /root/brimir, feel free to modify it according to your environment.
+user_email : this is the first user (first user that will be created, allowing you to login) 's email address. 
+user_password : Again, this is the first user's password. I would recommend you to create a dumb password, and then modify it from Brimir.
+sender_mail : This is the email address Brimir will be using to send notifications.
+brimir_host : This is Brimir's URL (example : support.domain.com).
 
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
 
 Example Playbook
 ----------------
 
 Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
 
-    - hosts: servers
+    - hosts: brimir_server
       roles:
-         - { role: username.rolename, x: 42 }
+         - { role: thehunt33r.brimir, user_email: 'test@domain.com'       user_password: 'root' }
 
 License
 -------
@@ -35,4 +37,4 @@ BSD
 Author Information
 ------------------
 
-An optional section for the role authors to include contact information, or a website (HTML is not allowed).
+If you want to contact me, please do so at matthieu@matthieu-antoine.me

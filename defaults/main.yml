@@ -1,2 +1,9 @@
 ---
 # defaults file for brimir
+passenger_key: '561F9B9CAC40B2F7' 
+# This is the repo key of Passenger for Debian 8. If you are using a different flavor of Debian, please set accordingly
+install_path: '/root/brimir'
+user_email: 'test@domain.com'
+user_password: 'root'
+sender_mail: 'support@domain.com'
+brimir_host: 'support.domain.com'
