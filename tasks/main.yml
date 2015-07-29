@@ -55,11 +55,11 @@
       ignore_errors: True
 
     - name: Copy production.rb
-      copy: src=files/production.rb
+      template: src=production.j2.rb
             dest={{ install_path }}/config/environments/production.rb
 
     - name: Generate database.yml
-      script : files/setup-database.sh {{ install_path }}
+      script : setup-database.sh {{ install_path }}
 
     - name: Install dependencies
       shell: cd {{ install_path }} && bundle install --without sqlite mysql development test --deployment
@@ -74,11 +74,17 @@
       shell: cd {{ install_path }} && bin/rake assets:precompile RAILS_ENV=production
 
     - name: Generate user creation script
-      template: src=templates/loadFirstUser.j2
+      template: src=loadFirstUser.j2
                 dest={{ install_path }}/loadUser.rb
     - name: Create first user in db
       shell: cd {{ install_path }} && bin/rails console production < loadUser.rb
+      ignore_errors: true
 
+    - name: Install service file
+      template: src=brimir.j2.service dest=/etc/systemd/system/brimir.service
   ## TODO : Create system unit service
-    - name: Launch brimir
-      shell: cd {{ install_path }} && passenger start -a 0.0.0.0 -p 3000 -e production -d
+    # - name: Launch brimir
+    #   shell: cd {{ install_path }} && passenger start -a 0.0.0.0 -p 3000 -e production -d
+
+    - name: Start brimir
+      service: name=brimir state=started
