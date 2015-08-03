@@ -31,7 +31,9 @@ Role Variables
 
 **brimir_host** : This is Brimir's URL (example : support.domain.com).
 
+**listen_address** : The address on which Passenger will listen. Default is 0.0.0.0
 
+**listen_port** : The port on which Passenger will listen. Default is 3000
 Example Playbook
 ----------------
 
