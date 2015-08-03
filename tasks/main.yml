@@ -80,11 +80,14 @@
       shell: cd {{ install_path }} && bin/rails console production < loadUser.rb
       ignore_errors: true
 
+    - name: Install service file environment
+      template: src=brimir.j2 dest=/etc/default/brimir
+    
     - name: Install service file
-      template: src=brimir.j2.service dest=/etc/systemd/system/brimir.service
+      command: cp {{install_path}}/script/systemd/passenger-brimir.service /etc/systemd/system/passenger-brimir.service 
   ## TODO : Create system unit service
     # - name: Launch brimir
     #   shell: cd {{ install_path }} && passenger start -a 0.0.0.0 -p 3000 -e production -d
 
     - name: Start brimir
-      service: name=brimir state=started
+      service: name=passenger-brimir state=started
